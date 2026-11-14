@@ -1,0 +1,10 @@
+# The libraries this project needs. Install with:  python -m pip install -r requirements.txt
+# (The semantic-model library, sentence-transformers, gets added in Session 7.)
+requests
+pandas
+scikit-learn
+beautifulsoup4
+pyyaml
+matplotlib
+streamlit
+pytest

@@ -1,0 +1,20 @@
+# Files git should NOT save or upload.
+
+# Downloaded article text (copyright belongs to the authors; we share the download script instead)
+data/raw/
+data/processed/
+data/cache/
+
+# Python's own temporary files
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Virtual environments (ours lives outside the project, but just in case)
+.venv/
+venv/
+
+# Editor and tool folders
+.vscode/
+.idea/
+graphify-out/
