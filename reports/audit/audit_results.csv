@@ -1,0 +1,3 @@
+labels,precision,recall,f1
+original (author tags),0.7037,0.75,0.7261
+corrected (after audit),0.7654,0.7654,0.7654

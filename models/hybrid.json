@@ -1,0 +1,8 @@
+{
+  "model": "hybrid",
+  "weight_tfidf": 0.7,
+  "components": [
+    "tfidf.joblib",
+    "semantic.joblib"
+  ]
+}

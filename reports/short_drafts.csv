@@ -1,0 +1,13 @@
+model,draft,micro_f1,macro_f1,p_at_3,review_pct
+keyword,full,0.6002,0.5203,0.4355,4.8
+keyword,first_40_words,0.3765,0.2617,0.3357,52.1
+keyword,first_10_words,0.3198,0.1927,0.2936,98.0
+tfidf,full,0.7143,0.649,0.5319,1.8
+tfidf,first_40_words,0.5056,0.4012,0.3844,23.0
+tfidf,first_10_words,0.3566,0.2702,0.2998,98.0
+semantic,full,0.6755,0.6123,0.5248,3.3
+semantic,first_40_words,0.5087,0.4395,0.4009,4.1
+semantic,first_10_words,0.3634,0.2987,0.2842,97.6
+hybrid,full,0.7194,0.6511,0.5376,2.7
+hybrid,first_40_words,0.5402,0.4714,0.4061,8.7
+hybrid,first_10_words,0.3772,0.2983,0.305,97.6

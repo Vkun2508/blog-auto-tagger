@@ -1,0 +1,4 @@
+{
+  "model": "keyword",
+  "note": "No learned weights: keywords come from taxonomy/taxonomy.yaml."
+}

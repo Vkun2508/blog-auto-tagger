@@ -1,0 +1,5 @@
+model,label,micro_precision,micro_recall,micro_f1,macro_precision,macro_recall,macro_f1,p_at_3,r_at_3,review_coverage_pct,auto_micro_f1,ms_per_post
+keyword,Keyword baseline,0.649,0.5582,0.6002,0.5819,0.5076,0.5203,0.4355,0.6869,95.2,0.6135,16.0
+tfidf,TF-IDF + Logistic Regression,0.6793,0.753,0.7143,0.6301,0.6939,0.649,0.5319,0.8206,98.2,0.7187,10.8
+semantic,Semantic (MiniLM embeddings),0.6628,0.6888,0.6755,0.6453,0.6273,0.6123,0.5248,0.8093,96.7,0.6844,161.7
+hybrid,Hybrid (TF-IDF + Semantic),0.7005,0.7395,0.7194,0.66,0.676,0.6511,0.5376,0.8284,97.3,0.7273,172.7

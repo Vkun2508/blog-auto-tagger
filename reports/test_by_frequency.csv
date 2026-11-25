@@ -1,0 +1,13 @@
+model,bucket,tags,macro_f1
+keyword,common,Python; Security; AI & LLMs; DevOps; Docker & Kubernetes; Cloud; Databases; Mobile,0.6241
+keyword,medium,JavaScript; React; API Development; Machine Learning; Data Science; Software Architecture; Git,0.4252
+keyword,rare,TypeScript; Frontend; Java; Go; Rust; Testing; Career,0.4969
+tfidf,common,Python; Security; AI & LLMs; DevOps; Docker & Kubernetes; Cloud; Databases; Mobile,0.7476
+tfidf,medium,JavaScript; React; API Development; Machine Learning; Data Science; Software Architecture; Git,0.5455
+tfidf,rare,TypeScript; Frontend; Java; Go; Rust; Testing; Career,0.6398
+semantic,common,Python; Security; AI & LLMs; DevOps; Docker & Kubernetes; Cloud; Databases; Mobile,0.7032
+semantic,medium,JavaScript; React; API Development; Machine Learning; Data Science; Software Architecture; Git,0.5344
+semantic,rare,TypeScript; Frontend; Java; Go; Rust; Testing; Career,0.5861
+hybrid,common,Python; Security; AI & LLMs; DevOps; Docker & Kubernetes; Cloud; Databases; Mobile,0.7532
+hybrid,medium,JavaScript; React; API Development; Machine Learning; Data Science; Software Architecture; Git,0.5663
+hybrid,rare,TypeScript; Frontend; Java; Go; Rust; Testing; Career,0.619

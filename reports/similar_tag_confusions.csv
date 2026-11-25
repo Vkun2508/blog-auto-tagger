@@ -1,0 +1,19 @@
+suggested_tag,true_tag,posts
+AI & LLMs,Machine Learning,5
+Machine Learning,AI & LLMs,50
+Machine Learning,Data Science,1
+Data Science,Machine Learning,2
+Docker & Kubernetes,DevOps,5
+DevOps,Docker & Kubernetes,5
+Cloud,DevOps,3
+DevOps,Cloud,5
+JavaScript,TypeScript,12
+TypeScript,JavaScript,8
+React,JavaScript,4
+JavaScript,React,8
+React,Frontend,4
+Frontend,React,5
+API Development,Software Architecture,3
+Software Architecture,API Development,2
+Security,DevOps,2
+DevOps,Security,6
