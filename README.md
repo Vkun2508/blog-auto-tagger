@@ -6,7 +6,7 @@ an editor for review. Editors accept, remove or add tags, and the decisions are 
 Internship project: **Automated Content Tagging for Blogs** (Persevex, Artificial Intelligence).
 Author: Vinochan R.
 
-- **Live demo:** _added after deployment_
+- **Live demo:** https://blog-auto-tagger.streamlit.app (free hosting: if it is asleep, click "Yes, get this app back up" and wait about a minute)
 - **Report:** `reports/report.md` (PDF in the submission folder)
 - **Study notes:** `docs/LEARNING_NOTES.md` · **Viva prep:** `docs/VIVA_QA.md`
 

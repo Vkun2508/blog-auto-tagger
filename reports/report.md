@@ -14,7 +14,7 @@ On the newest 705 posts, held out by date, the **Hybrid (TF-IDF + semantic)** mo
 | Taxonomy, definitions, examples and alias map | `taxonomy/taxonomy.yaml` |
 | Reproducible data preparation (dataset not redistributed) | `scripts/01_download_devto.py`, `scripts/02_prepare_data.py`, `data/article_ids.csv` |
 | Training and evaluation code: keyword, TF-IDF, semantic | `tagger/models/`, `scripts/03_train.py` to `scripts/06_audit.py` |
-| Working demo with CSV/JSON export | {{LIVE_URL}} · `streamlit_app.py` |
+| Working demo with CSV/JSON export | https://blog-auto-tagger.streamlit.app · `streamlit_app.py` |
 | Source code | https://github.com/Vkun2508/blog-auto-tagger |
 
 ## 1. Data
@@ -319,7 +319,7 @@ be over-read.
 
 ## 8. The editor prototype
 
-The Streamlit app (`streamlit_app.py`, live at {{LIVE_URL}}) has three pages.
+The Streamlit app (`streamlit_app.py`, live at https://blog-auto-tagger.streamlit.app) has three pages.
 
 - **Tag a draft.** Paste or upload a title and body as text, Markdown or HTML. The app shows the
   ranked candidates as score bars with a tick at each tag's threshold (bars past the tick are
