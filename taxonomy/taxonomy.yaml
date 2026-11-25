@@ -1,0 +1,227 @@
+# Approved tag taxonomy for the Blog Auto-Tagger.
+#
+# Every tag has:
+#   definition : when an editor should use the tag (one or two sentences)
+#   examples   : illustrative post titles that clearly deserve the tag
+#   aliases    : raw author tags (as typed on DEV.to, lowercase) that MERGE into this tag.
+#                This is the alias map used to turn messy historical tags into approved labels.
+#                Each alias belongs to exactly one approved tag (a test checks this).
+#   keywords   : words and phrases the keyword baseline looks for in the title and body.
+#                Matching is whole-word. A keyword written in lowercase matches any case;
+#                a keyword written with capitals (e.g. "AI", "Rust", "in Go") matches that case only,
+#                which keeps ordinary words like "rust" or "go" from triggering the tag.
+#
+# The order of tags below is the order used everywhere (model columns, reports, the app).
+
+version: 1
+
+tags:
+  - name: Python
+    definition: Posts where Python code, Python libraries or the Python ecosystem (Django, Flask, FastAPI, packaging) are a main subject.
+    examples:
+      - "Building a REST API with FastAPI and Pydantic"
+      - "Five asyncio patterns every Python developer should know"
+    aliases: [python, python3, py, django, flask, fastapi, pydantic, pythonprogramming]
+    keywords: [python, python3, django, flask, fastapi, pydantic, pip install, virtualenv, venv, asyncio, pypi, poetry]
+
+  - name: JavaScript
+    definition: Posts about the JavaScript language or its runtimes and tooling (Node.js, Deno, Bun, npm), when not specifically about TypeScript or React.
+    examples:
+      - "Understanding closures and the event loop in JavaScript"
+      - "Streaming large files with Node.js"
+    aliases: [javascript, js, node, nodejs, npm, bunjs, bun, deno, ecmascript, vanillajs, express, expressjs]
+    keywords: [javascript, node.js, nodejs, npm, ecmascript, es6, deno, bun, express.js, vanilla js, JS]
+
+  - name: TypeScript
+    definition: Posts where TypeScript's type system, configuration or TypeScript-specific patterns are a main subject.
+    examples:
+      - "Generics in TypeScript explained with real examples"
+      - "Migrating a Node.js codebase to strict TypeScript"
+    aliases: [typescript, ts, nestjs]
+    keywords: [typescript, tsconfig, type-safe, type safety, type inference, generics, nestjs, zod]
+
+  - name: React
+    definition: Posts about React or frameworks built on it (Next.js, Remix), including hooks, components and state management in React.
+    examples:
+      - "When to use useMemo and useCallback in React"
+      - "Server components in Next.js, explained"
+    aliases: [react, reactjs, nextjs, next, remix, redux, reacthooks]
+    keywords: [React, reactjs, react.js, next.js, nextjs, jsx, usestate, useeffect, react hooks, redux, server components]
+
+  - name: Frontend
+    definition: Browser-side development that is not specific to React - HTML, CSS, layout, accessibility, UI, and other frameworks such as Vue, Angular and Svelte.
+    examples:
+      - "Modern CSS layout with grid and container queries"
+      - "Making a web form accessible to screen readers"
+    aliases: [frontend, css, html, vue, vuejs, angular, svelte, sveltekit, astro, a11y, accessibility, ui, ux, tailwindcss, tailwind, webcomponents, frontendchallenge]
+    keywords: [frontend, front-end, css, html, tailwind, vue, vue.js, angular, svelte, dom, responsive design, accessibility, flexbox, css grid, web components, ui design, browser]
+
+  - name: API Development
+    definition: Designing, building, documenting or consuming APIs and backend services (REST, GraphQL, gRPC, webhooks).
+    examples:
+      - "Designing idempotent REST endpoints for payments"
+      - "GraphQL vs REST: what we learned after a year"
+    aliases: [api, apis, rest, restapi, graphql, grpc, openapi, webhooks, backend, backenddevelopment]
+    keywords: [api, apis, rest api, restful, endpoint, endpoints, graphql, grpc, openapi, swagger, webhook, webhooks, backend, http request, status code, rate limit]
+
+  - name: Security
+    definition: Application, web and infrastructure security - vulnerabilities, authentication, encryption, secure coding and attacks or defences.
+    examples:
+      - "How we found and fixed an SQL injection in our login form"
+      - "OAuth 2.0 and JWT pitfalls in single-page apps"
+    aliases: [security, cybersecurity, infosec, appsec, devsecops, privacy, zerotrust, owasp, authentication, auth, oauth, jwt, authorization, ethicalhacking, hacking, pentesting, malware, websecurity]
+    keywords: [security, secure, vulnerability, vulnerabilities, cybersecurity, authentication, authorization, encryption, xss, csrf, sql injection, owasp, exploit, malware, phishing, zero trust, jwt, oauth, cve, penetration testing, threat model, attacker]
+
+  - name: Machine Learning
+    definition: Training, evaluating or deploying predictive models - classic ML, deep learning, computer vision and MLOps - as opposed to using LLM products.
+    examples:
+      - "Training an image classifier with PyTorch on a small dataset"
+      - "Why our model overfit and how cross-validation caught it"
+    aliases: [machinelearning, ml, deeplearning, computervision, nlp, pytorch, tensorflow, mlops, neuralnetworks, kagglechallenge, kaggle]
+    keywords: [machine learning, deep learning, neural network, neural networks, ML, model training, training data, pytorch, tensorflow, scikit-learn, sklearn, classifier, regression, computer vision, fine-tuning, fine-tune, mlops, overfitting, gradient descent, kaggle]
+
+  - name: AI & LLMs
+    definition: Using or building with large language models and AI assistants - prompting, agents, RAG, MCP, AI coding tools and generative AI products.
+    examples:
+      - "Building a RAG chatbot over our internal docs"
+      - "Writing an MCP server so an AI agent can call our API"
+    aliases: [ai, llm, llms, agents, aiagents, agenticai, mcp, rag, gemini, gemma, openai, chatgpt, claude, claudecode, genai, generativeai, promptengineering, githubcopilot, copilot, vibecoding, a2a, vllm, langchain, artificialintelligence, aie, gemmachallenge, ollama, anthropic, cursor, kiro, antigravity]
+    keywords: [AI, LLM, LLMs, large language model, chatgpt, gpt, openai, claude, gemini, anthropic, prompt, prompts, prompt engineering, ai agent, ai agents, agentic, RAG, retrieval-augmented, MCP, model context protocol, copilot, langchain, generative ai, genai, ollama, chatbot]
+
+  - name: Data Science
+    definition: Analysing, cleaning, visualising or engineering data - pandas, notebooks, statistics, analytics and data pipelines.
+    examples:
+      - "Cleaning messy CSV data with pandas"
+      - "Building a daily ETL pipeline with Airflow"
+    aliases: [datascience, dataengineering, data, analytics, pandas, jupyter, bigdata, dataanalysis, datavisualization, statistics, etl, spark, dataanalytics]
+    keywords: [data science, data scientist, data analysis, pandas, numpy, jupyter, data visualization, dataset, datasets, analytics, data engineering, etl, data pipeline, spark, matplotlib, statistics, dataframe, airflow]
+
+  - name: DevOps
+    definition: Delivering and running software - CI/CD, infrastructure as code, automation, monitoring, SRE and platform engineering.
+    examples:
+      - "A GitHub Actions pipeline that deploys on every merge"
+      - "Infrastructure as code with Terraform modules"
+    aliases: [devops, cicd, githubactions, terraform, ansible, sre, infrastructure, monitoring, observability, iac, gitops, platformengineering, jenkins, automation]
+    keywords: [devops, ci/cd, cicd, continuous integration, continuous deployment, github actions, jenkins, terraform, ansible, infrastructure as code, sre, observability, monitoring, prometheus, grafana, gitops, argocd, deployment pipeline, ci pipeline]
+
+  - name: Docker & Kubernetes
+    definition: Containers and container orchestration - Docker images and Compose, Kubernetes, Helm and managed Kubernetes services.
+    examples:
+      - "Shrinking a Docker image from 1 GB to 80 MB"
+      - "Autoscaling a Kubernetes deployment on queue length"
+    aliases: [docker, kubernetes, k8s, containers, container, helm, eks, aks, gke, podman, dockercompose, cloudnative]
+    keywords: [docker, dockerfile, docker compose, docker-compose, container, containers, containerized, kubernetes, k8s, kubectl, helm, pod, pods, eks, aks, gke, podman]
+
+  - name: Cloud
+    definition: Building on public cloud platforms (AWS, Azure, Google Cloud) and serverless services, including cloud cost and architecture on those platforms.
+    examples:
+      - "Serverless image resizing with AWS Lambda and S3"
+      - "Cutting our Azure bill by 40 percent"
+    aliases: [aws, cloud, azure, googlecloud, gcp, serverless, lambda, cloudcomputing, cloudflare, firebase, finops, awscommunity, amazonwebservices]
+    keywords: [cloud, aws, amazon web services, azure, google cloud, gcp, s3, ec2, aws lambda, serverless, cloudformation, iam, cloud run, cloudflare, vpc, firebase]
+
+  - name: Databases
+    definition: Database design, SQL, query performance and specific database systems (PostgreSQL, MySQL, MongoDB, Redis, vector databases).
+    examples:
+      - "Finding slow queries with EXPLAIN ANALYZE in PostgreSQL"
+      - "Choosing between Redis and Postgres for a job queue"
+    aliases: [database, databases, sql, postgres, postgresql, postgressql, mysql, mongodb, redis, sqlite, sqlserver, nosql, oracle, supabase, prisma, vectordatabase, dynamodb]
+    keywords: [database, databases, sql, postgres, postgresql, mysql, mongodb, redis, sqlite, nosql, query, queries, schema, orm, prisma, dynamodb, supabase, vector database, indexes, transaction]
+
+  - name: Software Architecture
+    definition: How systems are structured - system design, microservices, distributed systems, design patterns and scalability trade-offs.
+    examples:
+      - "Breaking up a monolith without breaking production"
+      - "Event-driven architecture with Kafka: lessons learned"
+    aliases: [architecture, systemdesign, microservices, distributedsystems, designpatterns, softwarearchitecture, eventdriven, kafka, cleanarchitecture, ddd]
+    keywords: [architecture, system design, microservices, monolith, distributed systems, design patterns, event-driven, scalability, message queue, kafka, domain-driven, clean architecture, hexagonal, cqrs, load balancer, trade-offs]
+
+  - name: Java
+    definition: Posts about Java and the JVM ecosystem (Spring Boot, Maven, Gradle).
+    examples:
+      - "Virtual threads in Java 21 under real load"
+      - "Spring Boot configuration you should not copy-paste"
+    aliases: [java, springboot, spring, jvm, maven, gradle, hibernate]
+    keywords: [Java, spring boot, springboot, jvm, maven, gradle, hibernate, jdk]
+
+  - name: Go
+    definition: Posts about the Go programming language (Golang) and its tooling.
+    examples:
+      - "Handling errors in Go without losing context"
+      - "Goroutines and channels by example"
+    aliases: [go, golang]
+    keywords: [golang, goroutine, goroutines, go.mod, go mod, go run, go build, in Go, Go code, written in Go]
+
+  - name: Rust
+    definition: Posts about the Rust programming language, its tooling and crates.
+    examples:
+      - "Understanding the borrow checker with three small programs"
+      - "Writing a fast CLI in Rust with clap"
+    aliases: [rust, rustlang]
+    keywords: [Rust, rustlang, cargo, rustc, crate, crates, borrow checker, tokio, rustacean]
+
+  - name: Mobile
+    definition: Building mobile apps for Android or iOS, natively or cross-platform (Flutter, React Native, Kotlin, Swift).
+    examples:
+      - "Offline-first sync in a Flutter app"
+      - "Jetpack Compose navigation patterns"
+    aliases: [mobile, android, ios, flutter, dart, reactnative, swift, swiftui, kotlin, androiddev, mobiledev, expo, jetpackcompose, flutterdev]
+    keywords: [mobile app, mobile apps, mobile, android, ios, iphone, flutter, dart, react native, swift, swiftui, kotlin, jetpack compose, xcode, app store, play store, expo]
+
+  - name: Git
+    definition: Version control with Git and Git hosting platforms (GitHub, GitLab) - branching, commits, pull requests and repository workflows.
+    examples:
+      - "Interactive rebase without fear"
+      - "A pull request template that speeds up code review"
+    aliases: [git, github, gitlab, versioncontrol, githubchallenge]
+    keywords: [git, github, gitlab, commit, commits, pull request, pull requests, merge conflict, rebase, git push, version control, repository]
+
+  - name: Testing
+    definition: Software testing and quality assurance - unit, integration and end-to-end tests, test tools and testing strategy.
+    examples:
+      - "Stop mocking everything: integration tests that stay fast"
+      - "End-to-end testing a checkout flow with Playwright"
+    aliases: [testing, playwright, qa, unittesting, tdd, jest, cypress, selenium, testautomation, pytest, vitest, softwaretesting]
+    keywords: [testing, unit test, unit tests, test cases, integration test, integration tests, e2e, end-to-end, playwright, cypress, selenium, jest, vitest, pytest, junit, tdd, test coverage, qa, mocking, test automation]
+
+  - name: Career
+    definition: The developer career - job searching, interviews, growth, leadership, workplace and wellbeing at work.
+    examples:
+      - "What I learned from 50 technical interviews"
+      - "Going from senior engineer to tech lead"
+    aliases: [career, interview, interviews, interviewing, jobs, jobsearch, leadership, resume, hiring, careeradvice, careerdevelopment, freelancing, remotework, mentalhealth, wecoded, techcareers]
+    keywords: [career, job, jobs, interview, interviews, hiring, resume, salary, promotion, junior developer, senior developer, layoffs, job search, mentor, mentorship, manager, burnout, imposter syndrome, freelance]
+
+# Raw tags that are deliberately NOT mapped to any approved tag.
+# They are either too generic to help a reader find posts (they appear on posts about every topic)
+# or they describe the post's format or an event rather than its subject.
+dropped_generic:
+  - webdev            # on 828 posts across every topic; Frontend covers real browser work
+  - programming
+  - beginners
+  - tutorial
+  - discuss
+  - showdev
+  - devchallenge
+  - opensource
+  - productivity
+  - learning
+  - coding
+  - softwaredevelopment
+  - softwareengineering
+  - development
+  - developer
+  - developers
+  - news
+  - community
+  - watercooler
+  - devjournal
+  - buildinpublic
+  - bugsmash
+  - hacktoberfest
+  - weekendchallenge
+  - performance
+  - tooling
+  - cli
+  - linux
+  - statemanagement    # used by Flutter and Angular authors too, so it does not mean React (found in error analysis)
