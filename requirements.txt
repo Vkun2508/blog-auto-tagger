@@ -1,10 +1,20 @@
-# The libraries this project needs. Install with:  python -m pip install -r requirements.txt
-# (The semantic-model library, sentence-transformers, gets added in Session 7.)
-requests
-pandas
-scikit-learn
-beautifulsoup4
-pyyaml
-matplotlib
-streamlit
-pytest
+# The libraries this project needs, pinned so the results can be reproduced.
+# Install with:  python -m pip install -r requirements.txt
+# The extra index provides the CPU-only build of PyTorch (about 200 MB instead of several GB of GPU code).
+# It is used by sentence-transformers for the semantic model, here and on the free hosting.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.15.0+cpu
+sentence-transformers==6.3.0
+transformers==5.24.1
+scikit-learn==1.9.1
+scipy==1.18.1
+numpy>=2.0
+pandas==3.1.1
+joblib==1.6.0
+requests==2.34.2
+beautifulsoup4==4.15.0
+PyYAML==6.0.3
+matplotlib==3.11.2
+streamlit==1.67.0
+markdown==3.11.3
+pytest==9.2.0
