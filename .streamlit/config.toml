@@ -1,0 +1,20 @@
+# Theme: "the editor's red pencil" - paper background, ink text, one red accent.
+[theme]
+base = "light"
+backgroundColor = "#FBF8F3"
+secondaryBackgroundColor = "#F2EEE6"
+textColor = "#1F2328"
+primaryColor = "#B3261E"
+borderColor = "#E3DDD2"
+baseRadius = "6px"
+showWidgetBorder = true
+# Format is "<name>:<Google Fonts CSS URL>"; the comma list adds a fallback if the font fails to load.
+font = "'IBM Plex Sans':https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap, sans-serif"
+headingFont = "'Source Serif 4':https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@500;600;700&display=swap, serif"
+codeFont = "'IBM Plex Mono':https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap, monospace"
+
+[server]
+maxUploadSize = 10
+
+[browser]
+gatherUsageStats = false
