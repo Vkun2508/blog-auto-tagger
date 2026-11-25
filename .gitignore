@@ -18,3 +18,9 @@ venv/
 .vscode/
 .idea/
 graphify-out/
+
+# Audit context holds the first 220 words of authors' posts (copyright), so keep it local
+reports/audit/audit_context.csv
+
+# Editor decisions saved by the app (local test data)
+feedback/
