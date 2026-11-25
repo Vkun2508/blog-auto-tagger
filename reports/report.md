@@ -7,7 +7,7 @@ routes a post to an editor when it is empty, too short, or no tag is confident e
 remove or add approved tags in a Streamlit app; their decisions are saved as feedback and can be
 exported for a whole batch as CSV or JSON.
 
-{{SUMMARY_RESULTS}}
+On the newest 705 posts, held out by date, the **Hybrid (TF-IDF + semantic)** model reaches micro-F1 **0.719** (macro-F1 0.651, P@3 0.538, R@3 0.828), tags 97.3% of posts without review and needs about 173 ms per post, against 0.600 for the keyword baseline. TF-IDF alone is almost as good (0.714) and 16× faster, so it is recommended for bulk tagging. A 40-post audit shows the authors' own tags are incomplete: measured against audited labels, precision rises from 0.704 to 0.765.
 
 | Deliverable | Where |
 |---|---|
@@ -15,7 +15,7 @@ exported for a whole batch as CSV or JSON.
 | Reproducible data preparation (dataset not redistributed) | `scripts/01_download_devto.py`, `scripts/02_prepare_data.py`, `data/article_ids.csv` |
 | Training and evaluation code: keyword, TF-IDF, semantic | `tagger/models/`, `scripts/03_train.py` to `scripts/06_audit.py` |
 | Working demo with CSV/JSON export | {{LIVE_URL}} · `streamlit_app.py` |
-| Source code | {{REPO_URL}} |
+| Source code | https://github.com/Vkun2508/blog-auto-tagger |
 
 ## 1. Data
 
@@ -66,7 +66,8 @@ text is kept. Short boilerplate lines ("follow me", "subscribe", "originally pub
 "thanks for reading"), lines that only list social sites, and **tag-widget lines** such as
 `#python #ai` are dropped, because those would hand the label to the model. Code blocks keep
 their language name and first 30 lines: code carries topic signal, but long listings drown out
-the prose. Titles are only whitespace-normalised.
+the prose. A YAML front-matter block at the top of a post (`title:`, `published:`, `cover_image:`, `series:` …),
+present in 654 posts, is removed as template text. Titles are only whitespace-normalised.
 
 **Duplicates.** Before splitting, posts are joined into groups when they share a normalised title,
 the same original (canonical) URL, or have TF-IDF cosine similarity of 0.90 or more. This found 12 groups containing 29 posts (16 links by identical title, 12 by near-identical body, none by canonical URL), mostly the same article posted twice by its author, sometimes in a second language.
@@ -107,17 +108,46 @@ of the 22 tags. The same suggestion logic (`tagger/suggest.py`) is then applied 
 
 Every choice below was made on the validation set; the test set was not used until Section 6.
 
-{{TITLE_WEIGHT_TEXT}}
+**Does giving the title extra weight help TF-IDF?** Title weights ×0 (title ignored) to ×3 were tried with
+C ∈ {4, 16, 64}. Because models with different C put scores on different scales, each configuration is compared
+at its own best threshold and tag limit on validation (the same search used in Section 5); the micro-F1 at a fixed
+0.5 threshold is shown only for reference.
+
+| Title weight | Best C | Micro-F1 (best threshold) | Macro-F1 | P@3 | Micro-F1 at 0.5 |
+|---|---|---|---|---|---|
+| ×0 | C = 16 | 0.688 | 0.588 | 0.508 | 0.565 |
+| ×1 | C = 64 | 0.682 | 0.593 | 0.493 | 0.588 |
+| ×2 | C = 4 | 0.613 | 0.506 | 0.442 | 0.515 |
+| ×3 | C = 4 | 0.565 | 0.459 | 0.406 | 0.513 |
+
+Weights ×0 and ×1 are practically tied (0.688 vs 0.682), and extra weight hurts (×3: 0.565). Titles on
+DEV.to are often written to attract clicks ("I got rejected 2 minutes after applying") rather than to describe the
+topic, while the body names the technologies. The chosen configuration is title weight ×0
+with C = 16.
 
 ![Title weight](figures/title_weight.png)
 *TF-IDF validation micro-F1 by title weight and regularisation C.*
 
-{{POOLING_TEXT}}
+**How chunk representations are combined.** Each body chunk is encoded separately; the chunk vectors
+are then combined by averaging each dimension (mean) or taking its largest value (max), optionally joined
+(⊕, concatenation) with the title vector.
+
+| Pooling | Best C | Micro-F1 (best threshold) | Macro-F1 | P@3 |
+|---|---|---|---|---|
+| Title only | C = 4 | 0.522 | 0.432 | 0.383 |
+| Mean of body chunks | C = 4 | 0.667 | 0.569 | 0.484 |
+| Title ⊕ mean of chunks | C = 4 | 0.652 | 0.567 | 0.482 |
+| Title ⊕ max of chunks | C = 4 | 0.650 | 0.557 | 0.477 |
+
+The mean of the body chunks works best (0.667, C = 4): averaging
+smooths over sections that wander off-topic, while adding the title vector or taking the maximum adds noise. The title
+alone is clearly weaker (0.522), in line with the TF-IDF
+result.
 
 ![Pooling](figures/pooling.png)
 *Semantic model validation micro-F1 by chunk pooling.*
 
-{{HYBRID_TEXT}}
+**Hybrid.** Weights of 0.3, 0.5 and 0.7 for TF-IDF were tried; 0.7 TF-IDF and 0.3 semantic scored best (0.695), above either model alone (TF-IDF 0.688, semantic 0.667). The two models make different mistakes: TF-IDF keys on exact technology names, the encoder on overall meaning.
 
 ## 5. Thresholds and the review workflow
 
@@ -130,11 +160,30 @@ A post is **routed to review** when it is empty, has fewer than 30 words after c
 passes its threshold. The editor always sees the top five candidates with their scores, even when
 none passes.
 
-{{THRESHOLD_TABLE}}
+| Model | Threshold | Max tags | Val micro-F1 (global) | Tags with own threshold | Val micro-F1 (per-tag) |
+|---|---|---|---|---|---|
+| Keyword baseline | 0.40 | 2 | 0.555 | 21 | 0.616 |
+| TF-IDF + logistic regression | 0.15 | 5 | 0.688 | 21 | 0.703 |
+| Semantic (MiniLM) | 0.25 | 4 | 0.667 | 21 | 0.678 |
+| Hybrid (TF-IDF + semantic) | 0.20 | 4 | 0.695 | 21 | 0.723 |
 
-{{THRESHOLD_TEXT}}
+The trade-off for the default model (Hybrid (TF-IDF + semantic), up to 4 tags) on validation:
 
-![Threshold trade-off](figures/{{THRESHOLD_FIG}})
+| Threshold | Precision | Recall | Micro-F1 | Wrong tags / post | Missed tags / post | Sent to review |
+|---|---|---|---|---|---|---|
+| 0.10 | 0.576 | 0.794 | 0.668 | 1.12 | 0.40 | 0.6% |
+| 0.20 (chosen) | 0.752 | 0.646 | 0.695 | 0.41 | 0.68 | 6.1% |
+| 0.35 | 0.874 | 0.525 | 0.656 | 0.15 | 0.91 | 15.4% |
+| 0.50 | 0.916 | 0.412 | 0.569 | 0.07 | 1.13 | 28.2% |
+| 0.70 | 0.950 | 0.296 | 0.452 | 0.03 | 1.35 | 45.9% |
+
+Raising the threshold removes wrong suggestions quickly but misses more tags and sends more posts to an editor.
+The chosen global threshold sits where F1 peaks. The per-tag thresholds of the hybrid then range from 0.05 (Machine
+Learning, Java, Testing) to 0.30 (Rust); 14 of the 21 tags with their own threshold use a lower bar than the global
+0.20, because their correct scores are often modest, and five (React, AI & LLMs, Cloud, Git, Rust) a higher one. Per-tag thresholds were tuned and measured on the same validation
+posts, so their validation gain is optimistic; the test results below are the unbiased check.
+
+![Threshold trade-off](figures/threshold_tradeoff_hybrid.png)
 *Precision, recall and F1 of the default model on validation as the threshold changes.*
 
 ![Review rate](figures/review_rate_vs_threshold.png)
@@ -148,39 +197,125 @@ per-tag F1 so rare tags count equally; P@3 and R@3 look only at the top three ra
 coverage is the share of posts tagged without an editor; speed is the median time to tag one post,
 including cleaning, on a laptop CPU.
 
-{{TEST_TABLE}}
+| Model | Precision | Recall | Micro-F1 | Macro-F1 | P@3 | R@3 | Auto-tagged | ms / post |
+|---|---|---|---|---|---|---|---|---|
+| Keyword baseline | 0.649 | 0.558 | 0.600 | 0.520 | 0.435 | 0.687 | 95.2% | 16 |
+| TF-IDF + logistic regression | 0.679 | 0.753 | 0.714 | 0.649 | 0.532 | 0.821 | 98.2% | 11 |
+| Semantic (MiniLM) | 0.663 | 0.689 | 0.675 | 0.612 | 0.525 | 0.809 | 96.7% | 162 |
+| **Hybrid (TF-IDF + semantic)** | 0.701 | 0.740 | 0.719 | 0.651 | 0.538 | 0.828 | 97.3% | 173 |
 
 ![Model comparison](figures/model_comparison.png)
 *Test-set comparison of the four models.*
 
-{{BEST_MODEL_TEXT}}
+**Which model balances quality, coverage and speed best?** All learned models beat the keyword
+baseline by a wide margin (micro-F1 0.600). The **Hybrid (TF-IDF + semantic)** model, chosen on validation
+before the test set was opened, is also the best on test: micro-F1
+0.719, macro-F1 0.651, P@3 0.538, R@3 0.828, with 97.3% of
+posts tagged without review, at about 173 ms per post including cleaning. TF-IDF alone is within
+0.005 micro-F1 and 16× faster (11 ms).
+
+The recommendation is therefore split by use: **the hybrid for the editor-facing app**, where 0.2 seconds is
+unnoticeable and its better handling of short drafts (below) matters, and **TF-IDF for bulk re-tagging of an
+archive**, where speed matters and quality is nearly the same. The semantic model on its own is slower than TF-IDF
+and less accurate, but it adds complementary signal to the hybrid.
 
 ### By tag frequency
 
 Tags were split into thirds by how many training posts they have.
 
-{{FREQ_TABLE}}
+| Model | Common | Medium | Rare |
+|---|---|---|---|
+| Keyword baseline | 0.624 | 0.425 | 0.497 |
+| TF-IDF + logistic regression | 0.748 | 0.545 | 0.640 |
+| Semantic (MiniLM) | 0.703 | 0.534 | 0.586 |
+| Hybrid (TF-IDF + semantic) | 0.753 | 0.566 | 0.619 |
 
-{{FREQ_TEXT}}
+Common: Python; Security; AI & LLMs; DevOps; Docker & Kubernetes; Cloud; Databases; Mobile. Medium: JavaScript; React; API Development; Machine Learning; Data Science; Software Architecture; Git. Rare: TypeScript; Frontend; Java; Go; Rust; Testing; Career.
+
+Common tags are easiest for every model. Frequency is not the whole story, though: the **medium** third is hardest, because it holds broad, overlapping tags. The weakest tags for Hybrid (TF-IDF + semantic) are Software Architecture (0.37), Go (0.47), API Development (0.50), Rust (0.52), while distinctive tags score high even with fewer examples: AI & LLMs (0.90), Java (0.86), Docker & Kubernetes (0.85), Mobile (0.84). Data Science has only 10 test posts, so its score is unreliable (flagged in Section 2). Per-tag results are in `reports/test_per_tag.csv`.
 
 ### Short drafts
 
 To imitate early drafts, each test post was cut to its title plus the first 40 or 10 words of the
 body.
 
-{{SHORT_TABLE}}
+| Model | Full post | Title + 40 words | Sent to review | Title + 10 words | Sent to review |
+|---|---|---|---|---|---|
+| Keyword baseline | 0.600 | 0.377 | 52.1% | 0.320 | 98.0% |
+| TF-IDF + logistic regression | 0.714 | 0.506 | 23.0% | 0.357 | 98.0% |
+| Semantic (MiniLM) | 0.675 | 0.509 | 4.1% | 0.363 | 97.6% |
+| Hybrid (TF-IDF + semantic) | 0.719 | 0.540 | 8.7% | 0.377 | 97.6% |
 
-{{SHORT_TEXT}}
+Quality falls as drafts get shorter. At 10 words almost every draft is routed to review by the 30-word rule, which is the intended behaviour. At 40 words, Hybrid (TF-IDF + semantic) keeps the most quality (0.540) while sending only 8.7% to review, against 23.0% for TF-IDF: the encoder still recognises the topic from a few sentences. Empty drafts are never scored and always go to review.
 
 ## 7. Errors and incomplete labels
 
 Examples come from `reports/error_examples.md` (titles and links only).
 
-{{ERRORS_TEXT}}
+**False positives and missed tags.** The five most confident wrong suggestions on test:
+
+| Score | Suggested tag | Post | True tags |
+|---|---|---|---|
+| 0.981 | Databases | [Update DB Schema in Production with Flyway like Syntax](https://dev.to/codenameone/update-db-schema-in-production-with-flyway-like-syntax-2lj6) | Java, Mobile |
+| 0.963 | Data Science | [Data Engineering Basics for Developers: Pipelines, Warehouses, and Streaming](https://dev.to/apeder/data-engineering-basics-for-developers-pipelines-warehouses-and-streaming-3b1m) | Databases, Software Architecture |
+| 0.946 | AI & LLMs | [I Put a Local LLM in Charge of a Colony and Asked It to Tell the Truth. It Didn't.](https://dev.to/mikachu/i-built-a-text-based-survival-game-to-test-ai-morals-the-honest-one-lost-3fan) | Machine Learning, Python |
+| 0.939 | AI & LLMs | [I built a Python script that generates writing and coding prompts for my 30-day writing challenge](https://dev.to/rupaligauravaram/i-built-a-python-script-that-generates-writing-and-coding-prompts-for-my-30-day-writing-challenge-36e4) | Data Science, Python |
+| 0.933 | AI & LLMs | [The Rootkit Exorcist: Summoning Local AI to Investigate Suspicious Scripts 👻](https://dev.to/data_secchronicles/the-rootkit-exorcist-summoning-local-ai-to-investigate-suspicious-scripts-an1) | Security |
+
+Most of these are arguably *correct* tags the author did not add: a post about database schema migrations
+suggested as Databases, a data-engineering primer as Data Science, two posts about running local LLMs as AI & LLMs.
+The most-missed tags are broad ones:
+
+| Tag | Missed | Test posts | Miss rate |
+|---|---|---|---|
+| DevOps | 55 | 131 | 0.420 |
+| Cloud | 30 | 63 | 0.476 |
+| Software Architecture | 28 | 40 | 0.700 |
+| AI & LLMs | 26 | 314 | 0.083 |
+| Testing | 25 | 72 | 0.347 |
+
+DevOps, Cloud and Software Architecture describe a *context* (where the code runs, how it is organised) more than a
+technology, so their wording varies widely between posts.
+
+**Similar tags.** The most frequent confusions for Hybrid (TF-IDF + semantic): Machine Learning suggested for AI & LLMs posts (50); JavaScript suggested for TypeScript posts (12); JavaScript suggested for React posts (8); TypeScript suggested for JavaScript posts (8).
+Machine Learning vs AI & LLMs is the largest: many posts about LLM agents use ML vocabulary (training, models,
+evaluation), and the boundary in the taxonomy (training predictive models vs using LLM products) is a fine one.
+JavaScript, TypeScript and React overlap in the same way.
+
+**Short drafts.** 145 test posts were tagged exactly right from the full text but wrongly from the title and first 40
+words, e.g. *Dealing with sensitive permissions on Android* (Mobile, Security) became AI & LLMs. This is why drafts
+under 30 words are routed to review.
+
+**Niche topics.** Rare-tag misses cluster where a niche tag is implied rather than named, e.g. *Learn Trapping Rain
+Water… in DSA View* (true: TypeScript) was suggested JavaScript, and *I sent 17 pull requests…* (true: Git, Career)
+lost Career.
+
+**Long multi-topic posts.** Long posts were not a major weakness: among the longest 10% of posts with three or more
+tags, the model often finds every tag (e.g. *Stop rebuilding from scratch: cache Docker layers on Cloud Build*: all four
+found). When it fails, it usually drops a secondary topic, because averaged chunk vectors and length-normalised TF-IDF
+both favour the dominant one. A
+Flutter post labelled React through the author tag `statemanagement` also exposed an alias-map error, which was
+fixed (the alias now sits in `dropped_generic`).
 
 ### The effect of incomplete historical labels
 
-{{AUDIT_TEXT}}
+A reviewer checked 40 randomly chosen test posts (seed 42), reading each post and marking approved tags
+that were **missing** from the author's labels or **wrong** for the post (first pass AI-assisted, then confirmed by
+Vinochan R; the reviewer could see the model's suggestions, which is how an editor would work but may bias towards
+agreeing with them). The sheet is `reports/audit/audit_sample.csv`; scoring is `scripts/06_audit.py --score`.
+
+| Hybrid (TF-IDF + semantic) measured against | Precision | Recall | F1 |
+|---|---|---|---|
+| Authors' original tags | 0.704 | 0.750 | 0.726 |
+| Audited tags | 0.765 | 0.765 | 0.765 |
+
+7 of 40 posts were missing at least one correct approved tag, and 5 of the model's 24 "false positives"
+(21%) were judged correct. A few author tags were simply wrong (for example AI & LLMs on a post about a slow
+JavaScript log line). So the historical labels **understate** the model: precision against audited labels is
+0.061 higher. Two causes stand out: DEV.to allows only four tags, and 62% of posts spend at least one slot
+on a generic tag such as `beginners`; and authors tag what they think readers search for, not every topic covered.
+Because the test labels are noisy in this way, small differences between models (a few thousandths of F1) should not
+be over-read.
 
 ## 8. The editor prototype
 
@@ -201,7 +336,11 @@ with the most matches of that tag's taxonomy keywords, earliest first on ties, c
 characters. No sentence is shown when no keyword appears. The rule is simple enough for an editor
 to check.
 
-{{APP_FIGURES}}
+![Tag a draft](figures/app_tag.png)
+*Tag a draft: ranked candidates with score bars and threshold ticks, the supporting sentence, and the editor panel.*
+
+![Batch review](figures/app_batch.png)
+*Batch review: the editable final-tags column and CSV/JSON export.*
 
 ## 9. Success criteria
 
@@ -216,7 +355,7 @@ to check.
 
 - Labels are the authors' own tags: at most four per post and often generic, so measured precision
   understates real quality (Section 7). More editor-checked labels would give a fairer test set.
-- {{LIMIT_RARE}}
+- Tags with few recent posts (Data Science has 10 test posts) cannot be evaluated reliably; collecting more posts for them, or merging them, is the next data step.
 - The semantic model is a small general-purpose encoder; fine-tuning it on tagged posts, or a
   larger encoder, may help similar-tag confusions.
 - Feedback on the free host is stored on a temporary disk; a real deployment would write it to a

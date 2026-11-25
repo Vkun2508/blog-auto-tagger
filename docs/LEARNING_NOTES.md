@@ -75,7 +75,12 @@ only match with capitals. That stops "said" matching "ai", "rust on my bike" mat
 "go to settings" matching Go.
 
 **Tag counts:** we count how many posts carry each tag in each split and flag tags with too few
-examples to evaluate reliably (`reports/tag_counts.csv`). Frontend is the smallest tag.
+examples to evaluate reliably (`reports/tag_counts.csv`). Frontend is the smallest tag (145 posts); only
+Data Science is flagged (just 10 test posts).
+
+**An alias we got wrong:** we first mapped `statemanagement` to React. Error analysis showed Flutter posts
+using it too, so it moved to `dropped_generic`. The audit also showed `oauth` should mean Security. Fixing
+the taxonomy when the data proves it wrong is normal, and a good story for the viva.
 
 ---
 
@@ -165,6 +170,12 @@ so a post can get several yes answers. That's how multi-label works here.
 **Title weight experiment:** titles are short but packed with topic words. We built separate TF-IDF
 features for the title and body and tried multiplying the title part by 0, 1, 2 and 3, keeping
 whichever scored best on validation (the brief asks for this test). See `reports/figures/title_weight.png`.
+**Result:** weight 0 and 1 tied (0.688 vs 0.682) and 2-3 were worse. DEV.to titles are often catchy
+("I got rejected 2 minutes after applying") rather than descriptive, so the body carries the topic.
+
+**Fair comparison:** each setting was judged at its *own best threshold*, not at a fixed 0.5. A strongly
+regularised model rarely scores above 0.5 even when its ranking is right, so a fixed cut-off would
+measure the score scale instead of the quality.
 
 **C (regularisation):** how strongly the model is allowed to trust individual words. Small C = cautious,
 large C = trusts more (risk of memorising). We tried 1, 4 and 16 on validation.
@@ -184,12 +195,14 @@ covered start to end) and embed each one.
 **Pooling = combining chunks:** we tried four ways on validation: title only; the **mean** (average) of
 the chunk vectors; title + mean; title + **max** (the strongest value in each position). The winner is
 documented in `reports/validation_experiments.md` and the report.
+**Result:** the mean of the body chunks won (0.667); the title alone was weakest (0.522).
 
 **Then logistic regression again:** the 384 or 768 numbers per post go into the same one-vs-rest
 logistic regression as before. Embeddings are cached to disk so they're computed only once.
 
 **Hybrid:** the average of the TF-IDF and semantic scores. Two models that make *different* mistakes
-often do better together.
+often do better together. **Result:** 70% TF-IDF + 30% semantic was best, and the hybrid became the
+app's default model.
 
 ---
 
@@ -217,6 +230,10 @@ We run every model, with its tuned settings, on the **test set** (newest posts, 
 report micro-F1, macro-F1, P@3, R@3, review coverage and speed (milliseconds per post). Results are in
 `reports/test_results.md`.
 
+**The numbers to remember (test set, 705 newest posts):** keyword baseline micro-F1 0.600; TF-IDF 0.714
+(11 ms per post); semantic 0.675; **hybrid 0.719** (173 ms per post, 97% of posts tagged without review).
+The hybrid is used in the app; TF-IDF is nearly as good and 16x faster, so it suits bulk tagging.
+
 **By tag frequency:** we split tags into common, medium and rare thirds and report each, because a
 model can look good overall while failing the rare tags.
 
@@ -228,7 +245,9 @@ that cover several subjects.
 `beginners`. So a post about deploying Python with Docker may be labelled only "Python". If the model
 correctly suggests Docker & Kubernetes, the scoring counts it as *wrong*. The **audit**
 (`reports/audit/`) checks 40 test posts by hand: which tags are really missing or wrong. Re-scoring with
-the corrected labels shows how much the original labels underrate the model.
+the corrected labels shows how much the original labels underrate the model. **Result:** precision rose from
+0.704 to 0.765, 7 of 40 posts were missing a correct tag, and 21% of the model's "wrong" suggestions were
+actually right.
 
 ---
 

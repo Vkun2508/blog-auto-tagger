@@ -68,8 +68,9 @@ We train one yes/no classifier per tag, 22 in total. Each gives a probability, s
 tags.
 
 **15. Did giving the title more weight help?**
-We tested title weights 0, 1, 2 and 3 on validation; the chart and the chosen value are in
-`reports/figures/title_weight.png` and the report.
+No. Weights 0 and 1 tied (0.688 vs 0.682 validation micro-F1) and 2-3 were worse. DEV.to titles are often
+catchy rather than descriptive ("I got rejected 2 minutes after applying"), so the body carries the topic.
+Each setting was compared at its own best threshold, so the comparison was fair.
 
 **16. What is a sentence embedding?**
 A pretrained neural network turns text into 384 numbers that capture meaning, so texts about the same
@@ -78,7 +79,7 @@ topic land close together even when they use different words.
 **17. How do you handle long articles in the semantic model?**
 Split the body into ~150-word chunks (at most 8, spread evenly across the post), embed each chunk and
 combine them. We compared title-only, average of chunks, title + average, and title + maximum on
-validation and kept the best.
+validation; the average of the body chunks won (0.667).
 
 **18. Why might TF-IDF beat a neural model here?**
 Tags are largely about named technologies (Docker, React, Postgres). Exact words are strong signals, and
@@ -114,8 +115,10 @@ Precision and recall looking only at the top three ranked tags, which matches wh
 The share of posts the system tags without sending them to an editor.
 
 **26. Which model did you pick and why?**
-The one with the best balance of quality, coverage and speed on validation, confirmed on the test set.
-The numbers and the reason are in the report's results section and in `models/settings.json`.
+The hybrid (70% TF-IDF + 30% semantic): best on validation and on test (micro-F1 0.719, 97% of posts
+tagged without review, 173 ms per post). TF-IDF alone is almost as good (0.714) and 16x faster (11 ms), so
+for bulk tagging an archive I'd use TF-IDF; for the editor app the hybrid, because it handles short drafts
+better and 0.2 seconds is unnoticeable.
 
 **27. What kinds of mistakes does it make?**
 Similar tags (AI & LLMs vs Machine Learning, Docker & Kubernetes vs DevOps), very short drafts, rare
@@ -125,7 +128,7 @@ topics with few training examples, and long posts that cover several subjects. E
 **28. How do incomplete historical labels affect your results?**
 Authors could pick only 4 tags and often used generic ones, so correct topics are missing from the labels.
 When the model suggests such a topic it's scored as wrong. Our 40-post audit measured this: precision
-against the corrected labels is higher than against the original ones.
+rose from 0.704 (authors' tags) to 0.765 (audited tags), and 21% of the "wrong" suggestions were correct.
 
 ## App and engineering
 
